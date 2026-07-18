@@ -154,6 +154,14 @@ export function createTicketApplication({
 
       serveStatic(request, response, rootDir);
     } catch (error) {
+      if (error.httpStatus && error.errorCode) {
+        sendJson(response, error.httpStatus, {
+          code: error.errorCode,
+          message: error.message
+        });
+        return;
+      }
+
       logger.error({
         operation,
         errorCode: "DB_WRITE_FAILED",
@@ -288,7 +296,14 @@ async function readJsonBody(request) {
     return {};
   }
 
-  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    const error = new Error("Corpo richiesta non e' JSON valido.");
+    error.httpStatus = 400;
+    error.errorCode = "INVALID_JSON";
+    throw error;
+  }
 }
 
 function serveStatic(request, response, rootDir) {
