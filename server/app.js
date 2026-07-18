@@ -135,6 +135,16 @@ export function createTicketApplication({
 
       if (request.method === "POST" && url.pathname === "/api/tickets") {
         operation = "create_ticket";
+
+        const contentType = request.headers["content-type"];
+        if (!contentType || !contentType.startsWith("application/json")) {
+          sendJson(response, 415, {
+            code: "UNSUPPORTED_MEDIA_TYPE",
+            message: "Content-Type non supportato. Usa application/json."
+          });
+          return;
+        }
+
         const body = await readJsonBody(request);
         const input = normalizeTicketInput(body);
         const fieldErrors = validateTicketInput(input);
