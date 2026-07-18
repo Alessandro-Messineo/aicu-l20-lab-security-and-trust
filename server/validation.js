@@ -2,10 +2,19 @@ export const validPriorities = ["bassa", "normale", "alta"];
 export const validSourceChannels = ["email", "telefono", "chat"];
 
 export function normalizeTicketInput(body) {
+  let description = "";
+  if (body.description != null) {
+    if (typeof body.description === "string") {
+      description = body.description.trim();
+    } else {
+      description = body.description;
+    }
+  }
+
   return {
     title: String(body.title || "").trim(),
     customer: String(body.customer || "").trim(),
-    description: String(body.description || "").trim(),
+    description,
     priority: String(body.priority || "").trim(),
     sourceChannel: String(body.sourceChannel || "").trim()
   };
@@ -28,6 +37,10 @@ export function validateTicketInput(input) {
 
   if (!validSourceChannels.includes(input.sourceChannel)) {
     fieldErrors.sourceChannel = "Canale di richiesta non valido.";
+  }
+
+  if (input.description && typeof input.description !== "string") {
+    fieldErrors.description = "La descrizione deve essere una stringa.";
   }
 
   return fieldErrors;
