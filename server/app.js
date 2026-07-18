@@ -156,7 +156,7 @@ export function createTicketApplication({
     } catch (error) {
       logger.error({
         operation,
-        errorCode: operation === "create_ticket" ? "DB_WRITE_FAILED" : "UNEXPECTED_ERROR",
+        errorCode: "DB_WRITE_FAILED",
         requestId
       });
       sendJson(response, 500, {
@@ -165,7 +165,7 @@ export function createTicketApplication({
       });
     }
   });
-
+  
   return {
     database,
     server,
